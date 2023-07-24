@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>四則演算問題</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 10px;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        #question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        #answer {
+            font-size: 18px;
+            margin-bottom: 20px;
+            width: 100px;
+            text-align: center;
+        }
+
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .number-button {
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .difficulty-button {
+            font-size: 18px;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #selectedDifficulty {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* スタートボタンを中央に配置 */
+        #startButton {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* スタートボタンのスタイル */
+        #startButton button {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>1分間四則演算問題</h1>
+        <div>
+            <button class="difficulty-button" onclick="setDifficulty('入門')">入門</button>
+            <button class="difficulty-button" onclick="setDifficulty('簡単')">簡単</button>
+            <button class="difficulty-button" onclick="setDifficulty('普通')">普通</button>
+            <button class="difficulty-button" onclick="setDifficulty('難しい')">難しい</button>
+            <button class="difficulty-button" onclick="setDifficulty('修羅')">修羅</button>
+        </div>
+        <div id="selectedDifficulty"></div>
+        <div id="question"></div>
+        <input type="text" id="answer" placeholder="答えを入力してください" onkeydown="checkEnter(event)" disabled>
+        <div id="startButton">
+            <button onclick="startGame()">スタート</button>
+        </div>
+        <div id="timer">残り時間: 60秒</div>
+        <div class="button-container">
+            <button class="number-button" onclick="appendToAnswer('1')">1</button>
+            <button class="number-button" onclick="appendToAnswer('2')">2</button>
+            <button class="number-button" onclick="appendToAnswer('3')">3</button>
+            <button class="number-button" onclick="appendToAnswer('4')">4</button>
+            <button class="number-button" onclick="appendToAnswer('5')">5</button>
+            <button class="number-button" onclick="appendToAnswer('6')">6</button>
+            <button class="number-button" onclick="appendToAnswer('7')">7</button>
+            <button class="number-button" onclick="appendToAnswer('8')">8</button>
+            <button class="number-button" onclick="appendToAnswer('9')">9</button>
+            <button class="number-button" onclick="appendToAnswer('0')">0</button>
+            <button class="number-button" onclick="appendToAnswer('-')">-</button>
+            <button class="number-button" onclick="clearAnswer()">C</button>
+        </div>
+        <div id="result"></div>
+
+        <!-- Sound effects -->
+        <audio id="correctSound" src="Quiz-Buzzer02-1.mp3"></audio>
+        <audio id="wrongSound" src="Quiz-Wrong_Buzzer02-1.mp3"></audio>
+
+
+    <script>
+        let timer;
+        let score = 0;
+        let timeLeft = 60;
+        let difficulty = '';
+        let inputEnabled = false;
+
+        function enableInput() {
+            inputEnabled = true;
+            document.getElementById('answer').removeAttribute('disabled');
+        }
+
+        function disableInput() {
+            inputEnabled = false;
+            document.getElementById('answer').setAttribute('disabled', 'disabled');
+        }
+
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateQuestion() {
+            let num1, num2;
+            let operator = '+';
+
+            if (difficulty === '入門') {
+                num1 = getRandomNumber(1, 9);
+                num2 = getRandomNumber(1, 9);
+            } else if (difficulty === '簡単') {
+                num1 = getRandomNumber(1, 9);
+                num2 = getRandomNumber(10, 99);
+            } else if (difficulty === '普通') {
+                num1 = getRandomNumber(1, 9);
+                num2 = getRandomNumber(100, 999);
+            } else if (difficulty === '難しい') {
+                num1 = getRandomNumber(100, 999);
+                num2 = getRandomNumber(1000, 9999);
+                const operators = ['+', '-', '*', '/'];
+                operator = operators[getRandomNumber(0, 3)];
+            } else if (difficulty === '修羅') {
+                num1 = getRandomNumber(100, 999);
+                num2 = getRandomNumber(100, 999);
+                const operators = ['+', '-', '*', '/', '√'];
+                operator = operators[getRandomNumber(0, 4)];
+            }
+
+            return `${num1} ${operator} ${num2}`;
+        }
+
+        function displayQuestion() {
+            document.getElementById('question').textContent = generateQuestion();
+        }
+
+        function checkAnswer() {
+            if (!inputEnabled) return;
+
+            const answer = parseFloat(document.getElementById('answer').value);
+            const question = document.getElementById('question').textContent;
+            const resultDiv = document.getElementById('result');
+            const correctSound = document.getElementById('correctSound');
+            const wrongSound = document.getElementById('wrongSound');
+
+            if (eval(question) === answer) {
+                score++;
+                resultDiv.textContent = '正解！';
+                correctSound.play();
+            } else {
+                resultDiv.textContent = '不正解！';
+                wrongSound.play();
+            }
+
+            // Clear the input field
+            document.getElementById('answer').value = '';
+
+            // Generate the next question
+            displayQuestion();
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 60;
+            document.getElementById('result').textContent = '';
+            document.getElementById('answer').value = '';
+            disableInput();
+            document.getElementById('startButton').style.display = 'none';
+            displayQuestion();
+
+            // Start the timer
+            startTimer();
+            enableInput(); // スタートしたら入力を有効化
+        }
+
+        function startTimer() {
+            const timerDiv = document.getElementById('timer');
+            timerDiv.textContent = `残り時間: ${timeLeft}秒`;
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDiv.textContent = `残り時間: ${timeLeft}秒`;
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            document.getElementById('question').textContent = '時間切れ！';
+            document.getElementById('answer').setAttribute('disabled', 'disabled');
+            document.getElementById('result').textContent = `スコア: ${score} 問`;
+            document.getElementById('timer').textContent = '';
+            document.getElementById('startButton').style.display = 'inline-block';
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+
+        function appendToAnswer(value) {
+            if (!inputEnabled) return;
+
+            document.getElementById('answer').value += value;
+        }
+
+        function clearAnswer() {
+            if (!inputEnabled) return;
+
+            document.getElementById('answer').value = '';
+        }   
+
+        function setDifficulty(selectedDifficulty) {
+            difficulty = selectedDifficulty;
+            document.getElementById('question').textContent = '';
+            document.getElementById('startButton').style.display = 'inline-block';
+            document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
+
+            if (selectedDifficulty !== '') {
+                disableInput(); // 難易度が選択されるまで入力を無効化
+            }
+        }
+
+    </script>
+</body>
+</html>
