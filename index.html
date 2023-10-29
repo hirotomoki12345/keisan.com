@@ -93,6 +93,9 @@
     </style>
 </head>
 <body>
+    <audio id="correctSound" src="correct.mp3"></audio>
+<audio id="wrongSound" src="wrong.mp3"></audio>
+
     <div class="container">
         <h1>1分間四則演算問題</h1>
         <div>
@@ -182,26 +185,31 @@
             document.getElementById('question').textContent = generateQuestion();
         }
 
-        function checkAnswer() {
-            if (!inputEnabled) return;
+function checkAnswer() {
+    if (!inputEnabled) return;
 
-            const answer = parseFloat(document.getElementById('answer').value);
-            const question = document.getElementById('question').textContent;
-            const resultDiv = document.getElementById('result');
+    const answer = parseFloat(document.getElementById('answer').value);
+    const question = document.getElementById('question').textContent;
+    const resultDiv = document.getElementById('result');
+    const correctSound = document.getElementById('correctSound'); // 正解の音声
+    const wrongSound = document.getElementById('wrongSound');     // 不正解の音声
 
-            if (eval(question) === answer) {
-                score++;
-                resultDiv.textContent = '正解！';
-            } else {
-                resultDiv.textContent = '不正解！';
-            }
+    if (eval(question) === answer) {
+        score++;
+        resultDiv.textContent = '正解！';
+        correctSound.play(); // 正解の音声を再生
+    } else {
+        resultDiv.textContent = '不正解！';
+        wrongSound.play();   // 不正解の音声を再生
+    }
 
-            // Clear the input field
-            document.getElementById('answer').value = '';
+    // Clear the input field
+    document.getElementById('answer').value = '';
 
-            // Generate the next question
-            displayQuestion();
-        }
+    // Generate the next question
+    displayQuestion();
+}
+
 
         function startGame() {
             score = 0;
