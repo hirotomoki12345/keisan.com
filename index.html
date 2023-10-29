@@ -13,7 +13,7 @@
     <audio id="wrongSound" src="Quiz-Wrong_Buzzer02-1.mp3"></audio>
 
     <div class="container">
-        <h1>1分間四則演算問題</h1>
+        <h1>1分間四剳演算問題</h1>
         <div>
             <button class="difficulty-button" onclick="setDifficulty('入門')">入門</button>
             <button class="difficulty-button" onclick="setDifficulty('簡単')">簡単</button>
@@ -35,7 +35,7 @@
             <button class="number-button" onclick="appendToAnswer('4')">4</button>
             <button class="number-button" onclick="appendToAnswer('5')">5</button>
             <button class="number-button" onclick="appendToAnswer('6')">6</button>
-            <button class "number-button" onclick="appendToAnswer('7')">7</button>
+            <button class="number-button" onclick="appendToAnswer('7')">7</button>
             <button class="number-button" onclick="appendToAnswer('8')">8</button>
             <button class="number-button" onclick="appendToAnswer('9')">9</button>
             <button class="number-button" onclick="appendToAnswer('0')">0</button>
@@ -190,7 +190,7 @@
         function setDifficulty(selectedDifficulty) {
             difficulty = selectedDifficulty;
             document.getElementById('question').textContent = '';
-            document.getElementById('startButton').style display = 'inline-block';
+            document.getElementById('startButton').style.display = 'inline-block';
             document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
             selectedDifficulty = true;
         }
