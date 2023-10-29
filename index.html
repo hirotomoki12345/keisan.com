@@ -51,10 +51,9 @@
     <script>
         let selectedDifficulty = false;
         let timer;
-        let score = 0;
-        let timeLeft = 60;
         let difficulty = '';
         let inputEnabled = false;
+        let correctAnswers = 0; // Keep track of the correct answers.
 
         function enableInput() {
             inputEnabled = true;
@@ -128,7 +127,7 @@
             const wrongSound = document.getElementById('wrongSound');
 
             if (eval(question) === answer) {
-                score += getQuestionDifficultyMultiplier();
+                correctAnswers++;
                 resultDiv.textContent = '正解！';
                 correctSound.play();
             } else {
@@ -141,8 +140,7 @@
         }
 
         function startGame() {
-            score = 0;
-            timeLeft = 60;
+            correctAnswers = 0; // Reset the correct answers count.
             document.getElementById('result').textContent = '';
             document.getElementById('answer').value = '';
             disableInput();
@@ -154,11 +152,9 @@
 
         function startTimer() {
             const timerDiv = document.getElementById('timer');
-            timerDiv.textContent = `残り時間: ${timeLeft}秒`;
+            timerDiv.textContent = `残り時間: 60秒`;
             timer = setInterval(() => {
-                timeLeft--;
                 timerDiv.textContent = `残り時間: ${timeLeft}秒`;
-
                 if (timeLeft <= 0) {
                     endGame();
                 }
@@ -169,6 +165,7 @@
             clearInterval(timer);
             document.getElementById('question').textContent = '時間切れ！';
             document.getElementById('answer').setAttribute('disabled', 'disabled');
+            const score = calculateScore(); // Calculate the score.
             document.getElementById('result').textContent = `スコア: ${score} 問`;
             document.getElementById('timer').textContent = '';
             document.getElementById('startButton').style.display = 'inline-block';
@@ -193,12 +190,27 @@
         function setDifficulty(selectedDifficulty) {
             difficulty = selectedDifficulty;
             document.getElementById('question').textContent = '';
-            document.getElementById('startButton').style.display = 'inline-block';
+            document.getElementById('startButton').style display = 'inline-block';
             document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
             selectedDifficulty = true;
         }
 
         setDifficulty('入門');
+
+        function calculateScore() {
+            // Define a score multiplier for each difficulty.
+            const scoreMultipliers = {
+                '入門': 1,
+                '簡単': 2,
+                '普通': 3,
+                '難しい': 4,
+                '修羅': 5,
+            };
+
+            // Calculate the score based on correctAnswers and the selected difficulty.
+            const difficultyMultiplier = scoreMultipliers[difficulty] || 1;
+            return correctAnswers * difficultyMultiplier;
+        }
     </script>
 </body>
 </html>
