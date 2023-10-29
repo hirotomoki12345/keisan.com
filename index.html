@@ -272,13 +272,13 @@ function startGame() {
             document.getElementById('answer').value = '';
         }   
 
-function setDifficulty(selectedDifficulty) {
-    difficulty = selectedDifficulty;
-    document.getElementById('question').textContent = '';
-    document.getElementById('startButton').style.display = 'inline-block';
-    document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
-    selectedDifficulty = true; // 難易度が選択された場合にフラグを設定
-}
+        function setDifficulty(selectedDifficulty) {
+            difficulty = selectedDifficulty;
+            document.getElementById('question').textContent = '';
+            document.getElementById('startButton').style.display = 'inline-block';
+            document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
+            selectedDifficulty = true; // 難易度が選択された場合にフラグを設定
+        }
 
     </script>
 </body>
