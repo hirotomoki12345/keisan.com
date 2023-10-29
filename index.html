@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>1分間四剳演算問題</title>
+    <!-- FirebaseのSDKを読み込む -->
+<script src="https://www.gstatic.com/firebasejs/9.6.4/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.4/firebase-database.js"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         /* Your CSS styles here */
@@ -47,8 +51,29 @@
         </div>
         <div id="result"></div>
     </div>
-
+<div>
+  <h2>High Scores</h2>
+  <ul id="scoresList">
+    <!-- High scores will be displayed here -->
+  </ul>
+</div>
     <script>
+
+          const firebaseConfig = {
+  apiKey: "AIzaSyDGHRQsE7-YH0UxEJ8FvdShUr3_k3AoMQM",
+  authDomain: "ip-add-47c83.firebaseapp.com",
+  databaseURL: "https://ip-add-47c83-default-rtdb.firebaseio.com",
+  projectId: "ip-add-47c83",
+  storageBucket: "ip-add-47c83.appspot.com",
+  messagingSenderId: "711426693718",
+  appId: "1:711426693718:web:58596892bf55e38d0779f7",
+  measurementId: "G-J8856JS59G"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+        
         let selectedDifficulty = false;
         let timer;
         let difficulty = '';
@@ -164,15 +189,29 @@
             }, 1000);
         }
 
-        function endGame() {
-            clearInterval(timer);
-            document.getElementById('question').textContent = '時間切れ！';
-            document.getElementById('answer').setAttribute('disabled', 'disabled');
-            const score = calculateScore(); // Calculate the score.
-            document.getElementById('result').textContent = `スコア: ${score} 問`;
-            document.getElementById('timer').textContent = '';
-            document.getElementById('startButton').style.display = 'inline-block';
-        }
+function endGame() {
+  clearInterval(timer);
+  document.getElementById('question').textContent = '時間切れ！';
+  document.getElementById('answer').setAttribute('disabled', 'disabled');
+  const score = calculateScore(); // Calculate the score.
+  document.getElementById('result').textContent = `スコア: ${score} 問`;
+  document.getElementById('timer').textContent = '';
+  document.getElementById('startButton').style.display = 'inline-block';
+
+  // Ask the player for their name
+  const playerName = prompt("Enter your name:");
+  if (playerName) {
+    // Reference to your Firebase database
+    const database = firebase.database();
+
+    // Push the score along with the player's name to the "scores" node
+    database.ref("scores").push({
+      name: playerName,
+      score: score,
+    });
+  }
+}
+
 
         function checkEnter(event) {
             if (event.key === 'Enter') {
@@ -214,6 +253,28 @@
             const difficultyMultiplier = scoreMultipliers[difficulty] || 1;
             return correctAnswers * difficultyMultiplier;
         }
+
+        // Function to display high scores
+function displayHighScores() {
+  const database = firebase.database();
+  const scoresRef = database.ref("scores").orderByChild("score").limitToLast(10);
+
+  scoresRef.on("value", (snapshot) => {
+    const scoresList = document.getElementById("scoresList");
+    scoresList.innerHTML = ""; // Clear previous scores
+
+    snapshot.forEach((child) => {
+      const scoreData = child.val();
+      const scoreItem = document.createElement("li");
+      scoreItem.textContent = `${scoreData.name}: ${scoreData.score} 問`;
+      scoresList.appendChild(scoreItem);
+    });
+  });
+}
+
+// Call this function to display high scores
+displayHighScores();
+
     </script>
 </body>
 </html>
