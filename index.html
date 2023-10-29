@@ -133,6 +133,8 @@
     </div>
 
     <script>
+        let selectedDifficulty = false; // 難易度が選択されているかどうかを示すフラグ
+
         let timer;
         let score = 0;
         let timeLeft = 60;
@@ -211,19 +213,24 @@ function checkAnswer() {
 }
 
 
-        function startGame() {
-            score = 0;
-            timeLeft = 60;
-            document.getElementById('result').textContent = '';
-            document.getElementById('answer').value = '';
-            disableInput();
-            document.getElementById('startButton').style.display = 'none';
-            displayQuestion();
+function startGame() {
+    if (selectedDifficulty) {
+        score = 0;
+        timeLeft = 60;
+        document.getElementById('result').textContent = '';
+        document.getElementById('answer').value = '';
+        disableInput();
+        document.getElementById('startButton').style.display = 'none';
+        displayQuestion();
 
-            // Start the timer
-            startTimer();
-            enableInput();
-        }
+        // Start the timer
+        startTimer();
+        enableInput();
+    } else {
+        alert('難易度を選択してください！');
+    }
+}
+
 
         function startTimer() {
             const timerDiv = document.getElementById('timer');
@@ -265,16 +272,14 @@ function checkAnswer() {
             document.getElementById('answer').value = '';
         }   
 
-        function setDifficulty(selectedDifficulty) {
-            difficulty = selectedDifficulty;
-            document.getElementById('question').textContent = '';
-            document.getElementById('startButton').style.display = 'inline-block';
-            document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
+function setDifficulty(selectedDifficulty) {
+    difficulty = selectedDifficulty;
+    document.getElementById('question').textContent = '';
+    document.getElementById('startButton').style.display = 'inline-block';
+    document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
+    selectedDifficulty = true; // 難易度が選択された場合にフラグを設定
+}
 
-            if (selectedDifficulty !== '') {
-                disableInput();
-            }
-        }
     </script>
 </body>
 </html>
