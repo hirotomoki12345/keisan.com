@@ -214,7 +214,6 @@ function checkAnswer() {
 
 
 function startGame() {
-    if (selectedDifficulty) {
         score = 0;
         timeLeft = 60;
         document.getElementById('result').textContent = '';
@@ -226,10 +225,7 @@ function startGame() {
         // Start the timer
         startTimer();
         enableInput();
-    } else {
-        alert('難易度を選択してください！');
     }
-}
 
 
         function startTimer() {
