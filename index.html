@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>1分間四則演算問題</title>
+    <title>1分間四剳演算問題</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         /* Your CSS styles here */
@@ -52,6 +52,7 @@
         let selectedDifficulty = false;
         let timer;
         let difficulty = '';
+        let timeLeft = 60; // Define timeLeft variable
         let inputEnabled = false;
         let correctAnswers = 0; // Keep track of the correct answers.
 
@@ -154,7 +155,9 @@
             const timerDiv = document.getElementById('timer');
             timerDiv.textContent = `残り時間: 60秒`;
             timer = setInterval(() => {
+                timeLeft--;
                 timerDiv.textContent = `残り時間: ${timeLeft}秒`;
+
                 if (timeLeft <= 0) {
                     endGame();
                 }
