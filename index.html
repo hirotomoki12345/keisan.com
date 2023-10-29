@@ -35,7 +35,7 @@
             <button class="number-button" onclick="appendToAnswer('4')">4</button>
             <button class="number-button" onclick="appendToAnswer('5')">5</button>
             <button class="number-button" onclick="appendToAnswer('6')">6</button>
-            <button class="number-button" onclick="appendToAnswer('7')">7</button>
+            <button class "number-button" onclick="appendToAnswer('7')">7</button>
             <button class="number-button" onclick="appendToAnswer('8')">8</button>
             <button class="number-button" onclick="appendToAnswer('9')">9</button>
             <button class="number-button" onclick="appendToAnswer('0')">0</button>
@@ -114,6 +114,10 @@
             return `${num1} ${operator} ${num2}`;
         }
 
+        function displayQuestion() {
+            document.getElementById('question').textContent = generateQuestion();
+        }
+
         function checkAnswer() {
             if (!inputEnabled) return;
 
@@ -124,7 +128,7 @@
             const wrongSound = document.getElementById('wrongSound');
 
             if (eval(question) === answer) {
-                score += getQuestionDifficultyMultiplier(); // Award points based on difficulty
+                score += getQuestionDifficultyMultiplier();
                 resultDiv.textContent = '正解！';
                 correctSound.play();
             } else {
