@@ -41,11 +41,12 @@
 
         .number-button {
             font-size: 18px;
-            width: 40px;
+            width: 120px;
             height: 40px;
             margin: 5px;
             cursor: pointer;
             border-radius: 5px;
+            overflow: hidden;
         }
 
         .difficulty-button {
@@ -88,16 +89,7 @@
             cursor: pointer;
             border-radius: 5px;
         }
-    /* 新しいスタイルを追加 */
-    .number-button {
-        font-size: 18px;
-        width: 120px; /* ボタンの幅を調整 */
-        height: 40px;
-        margin: 5px;
-        cursor: pointer;
-        border-radius: 5px;
-        overflow: hidden; /* 文字がはみ出た場合は隠す */
-    }
+
     </style>
 </head>
 <body>
@@ -117,29 +109,25 @@
             <button onclick="startGame()">スタート</button>
         </div>
         <div id="timer">残り時間: 60秒</div>
-<div class="button-container">
-    <button class="number-button" onclick="appendToAnswer('1')">1</button>
-    <button class="number-button" onclick="appendToAnswer('2')">2</button>
-    <button class="number-button" onclick="appendToAnswer('3')">3</button>
-    <button class="number-button" onclick="appendToAnswer('4')">4</button>
-    <button class="number-button" onclick="appendToAnswer('5')">5</button>
-    <button class="number-button" onclick="appendToAnswer('6')">6</button>
-    <button class="number-button" onclick="appendToAnswer('7')">7</button>
-    <button class="number-button" onclick="appendToAnswer('8')">8</button>
-    <button class="number-button" onclick="appendToAnswer('9')">9</button>
-    <button class="number-button" onclick="appendToAnswer('0')">0</button>
-    <button class="number-button" onclick="appendToAnswer('-')">-</button>
-    <button class="number-button" onclick="clearAnswer()">C</button>
-</div>
-<div class="button-container">
-    <button class="number-button" onclick="checkAnswer()">答え合わせ</button>
-</div>
+        <div class="button-container">
+            <button class="number-button" onclick="appendToAnswer('1')">1</button>
+            <button class="number-button" onclick="appendToAnswer('2')">2</button>
+            <button class="number-button" onclick="appendToAnswer('3')">3</button>
+            <button class="number-button" onclick="appendToAnswer('4')">4</button>
+            <button class="number-button" onclick="appendToAnswer('5')">5</button>
+            <button class="number-button" onclick="appendToAnswer('6')">6</button>
+            <button class="number-button" onclick="appendToAnswer('7')">7</button>
+            <button class="number-button" onclick="appendToAnswer('8')">8</button>
+            <button class="number-button" onclick="appendToAnswer('9')">9</button>
+            <button class="number-button" onclick="appendToAnswer('0')">0</button>
+            <button class="number-button" onclick="appendToAnswer('-')">-</button>
+            <button class="number-button" onclick="clearAnswer()">C</button>
+        </div>
+        <div class="button-container">
+            <button class="number-button" onclick="checkAnswer()">答え合わせ</button>
+        </div>
         <div id="result"></div>
-
-        <!-- Sound effects -->
-        <audio id="correctSound" src="Quiz-Buzzer02-1.mp3"></audio>
-        <audio id="wrongSound" src="Quiz-Wrong_Buzzer02-1.mp3"></audio>
-
+    </div>
 
     <script>
         let timer;
@@ -200,16 +188,12 @@
             const answer = parseFloat(document.getElementById('answer').value);
             const question = document.getElementById('question').textContent;
             const resultDiv = document.getElementById('result');
-            const correctSound = document.getElementById('correctSound');
-            const wrongSound = document.getElementById('wrongSound');
 
             if (eval(question) === answer) {
                 score++;
                 resultDiv.textContent = '正解！';
-                correctSound.play();
             } else {
                 resultDiv.textContent = '不正解！';
-                wrongSound.play();
             }
 
             // Clear the input field
@@ -230,7 +214,7 @@
 
             // Start the timer
             startTimer();
-            enableInput(); // スタートしたら入力を有効化
+            enableInput();
         }
 
         function startTimer() {
@@ -280,7 +264,7 @@
             document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
 
             if (selectedDifficulty !== '') {
-                disableInput(); // 難易度が選択されるまで入力を無効化
+                disableInput();
             }
         }
     </script>
