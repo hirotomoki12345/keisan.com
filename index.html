@@ -133,7 +133,6 @@
     </div>
 
     <script>
-        setDifficulty('入門');
         let selectedDifficulty = false; // 難易度が選択されているかどうかを示すフラグ
 
         let timer;
@@ -276,6 +275,7 @@ function startGame() {
             document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
             selectedDifficulty = true; // 難易度が選択された場合にフラグを設定
         }
+        setDifficulty('入門');
 
     </script>
 </body>
