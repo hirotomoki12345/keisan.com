@@ -57,6 +57,52 @@
     <input type="hidden" id="ip" name="ip">
 </form>
 
+<div id="dataContainer"></div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // 指定されたURL
+  var url = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
+
+  // リクエストを送信
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      // データを取得成功した場合
+
+      // データを日付で降順にソート
+      data.data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+      // 表示する要素を作成
+      var dataContainer = document.getElementById("dataContainer");
+      var table = document.createElement("table");
+      var thead = document.createElement("thead");
+      var tbody = document.createElement("tbody");
+
+      // ヘッダ行を追加
+      var headerRow = document.createElement("tr");
+      headerRow.innerHTML = "<th>Date</th><th>Name</th><th>Text</th>";
+      thead.appendChild(headerRow);
+
+      // データ行を追加
+      data.data.forEach(row => {
+        var dataRow = document.createElement("tr");
+        dataRow.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
+        tbody.appendChild(dataRow);
+      });
+
+      // テーブルを組み立て
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      dataContainer.appendChild(table);
+    })
+    .catch(error => {
+      // エラーが発生した場合
+      console.error("Error fetching data:", error);
+    });
+}); //取得
+</script>  
+    
+
 <script>
 function getLocationAndSubmit() {
     getLocation()
