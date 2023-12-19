@@ -1,56 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Save Data to Google Sheet</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Data to Google Sheet</title>
 </head>
 <body>
 
 <form id="dataForm">
-  <label for="name">Name:</label>
-  <input type="text" id="name" name="name" required><br>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br>
 
-  <label for="sheetname">Sheet Name:</label>
-  <input type="text" id="sheetname" name="sheetname" required><br>
+    <label for="sheetname">Sheet Name:</label>
+    <input type="text" id="sheetname" name="sheetname" required><br>
 
-  <label for="text">Text:</label>
-  <textarea id="text" name="text" required></textarea><br>
+    <label for="text">Text:</label>
+    <textarea id="text" name="text" required></textarea><br>
 
-  <button type="button" onclick="getLocation()">Get Location</button>
-  <input type="hidden" id="location" name="location"><br>
+    <button type="button" onclick="getLocation()">Get Location</button>
+    <input type="hidden" id="location" name="location"><br>
 
-  <input type="hidden" id="ip" name="ip">
+    <input type="hidden" id="ip" name="ip">
 
-  <button type="button" onclick="submitForm()">Submit</button>
+    <button type="button" onclick="submitForm()">Submit</button>
 </form>
 
 <script>
 function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
 }
 
 function showPosition(position) {
-  document.getElementById("location").value = position.coords.latitude + "," + position.coords.longitude;
+    document.getElementById("location").value = position.coords.latitude + "," + position.coords.longitude;
 }
 
 function getIP() {
-  fetch('https://ipinfo.io?callback')
-    .then(res => res.json())
-    .then(json => {
-      document.getElementById("ip").value = json.ip;
-    })
-    .catch(error => console.error('Error fetching IP:', error));
+    fetch('https://ipinfo.io?callback')
+        .then(res => res.json())
+        .then(json => {
+            document.getElementById("ip").value = json.ip;
+        })
+        .catch(error => console.error('Error fetching IP:', error));
 }
 
 function submitForm() {
-  // Set IP before submitting
-  getIP();
-  
-  // Submit the form
-  document.getElementById("dataForm").submit();
+    // Set IP before submitting
+    getIP();
+
+    // Collect form data
+    var name = document.getElementById("name").value;
+    var sheetname = document.getElementById("sheetname").value;
+    var text = document.getElementById("text").value;
+    var location = document.getElementById("location").value;
+    var ip = document.getElementById("ip").value;
+
+    // Construct URL with parameters
+    var url = "https://script.google.com/macros/s/AKfycbxR0aKDKE1SdcfMCvnabvcj8EBagztP3T0s7TaSMTKu5tU4uoZQkaCoBNV6teRhpMZ-/exec" +
+              "?name=" + encodeURIComponent(name) +
+              "&sheetname=" + encodeURIComponent(sheetname) +
+              "&text=" + encodeURIComponent(text) +
+              "&location=" + encodeURIComponent(location) +
+              "&ip=" + encodeURIComponent(ip);
+
+    // Make a GET request with parameters
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        console.log(data);
+        // Handle the response as needed
+    })
+    .catch(error => console.error('Error submitting form:', error));
 }
 </script>
 
