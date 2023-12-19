@@ -34,7 +34,11 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        button:hover {
+        button:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
+        }
+        button:hover:enabled {
             background-color: #45a049;
         }
         #updateButton {
@@ -43,6 +47,10 @@
         }
         #updateButton:hover {
             background-color: #007B9E;
+        }
+        #updateButton:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -55,7 +63,7 @@
     <label for="text">Text:</label>
     <textarea id="text" name="text" required></textarea>
 
-    <button type="button" onclick="getLocationAndSubmit()">送信</button>
+    <button type="button" onclick="getLocationAndSubmit()" id="submitButton">送信</button>
     <input type="hidden" id="location" name="location">
     <input type="hidden" id="ip" name="ip">
 </form>
@@ -162,8 +170,12 @@ function submitForm() {
             console.log(data);
             document.getElementById("name").value = "";
             document.getElementById("text").value = "";
+            isButtonDisabled = false;
         })
-        .catch(error => console.error('Error submitting form:', error));
+        .catch(error => {
+            console.error('Error submitting form:', error);
+            isButtonDisabled = false;
+        });
 }
 
 document.addEventListener("DOMContentLoaded", updateData);
