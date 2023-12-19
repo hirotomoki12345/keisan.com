@@ -1,283 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>1分間四剳演算問題</title>
-    <!-- FirebaseのSDKを読み込む -->
-  <script src="https://cdn.firebase.com/js/client/2.3.2/firebase.js"></script>
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Your CSS styles here */
-    </style>
+  <title>Save Data to Google Sheet</title>
 </head>
 <body>
-    <audio id="correctSound" src="Quiz-Buzzer02-1.mp3"></audio>
-    <audio id="wrongSound" src="Quiz-Wrong_Buzzer02-1.mp3"></audio>
 
-    <div class="container">
-        <h1>1分間四剳演算問題</h1>
-        <div>
-            <button class="difficulty-button" onclick="setDifficulty('入門')">入門</button>
-            <button class="difficulty-button" onclick="setDifficulty('簡単')">簡単</button>
-            <button class="difficulty-button" onclick="setDifficulty('普通')">普通</button>
-            <button class="difficulty-button" onclick="setDifficulty('難しい')">難しい</button>
-            <button class="difficulty-button" onclick="setDifficulty('修羅')">修羅</button>
-        </div>
-        <div id="selectedDifficulty"></div>
-        <div id="question"></div>
-        <input type="text" id="answer" placeholder="答えを入力してください" onkeydown="checkEnter(event)" disabled>
-        <div id="startButton">
-            <button onclick="startGame()">スタート</button>
-        </div>
-        <div id="timer">残り時間: 60秒</div>
-        <div class="button-container">
-            <button class="number-button" onclick="appendToAnswer('1')">1</button>
-            <button class="number-button" onclick="appendToAnswer('2')">2</button>
-            <button class="number-button" onclick="appendToAnswer('3')">3</button>
-            <button class="number-button" onclick="appendToAnswer('4')">4</button>
-            <button class="number-button" onclick="appendToAnswer('5')">5</button>
-            <button class="number-button" onclick="appendToAnswer('6')">6</button>
-            <button class="number-button" onclick="appendToAnswer('7')">7</button>
-            <button class="number-button" onclick="appendToAnswer('8')">8</button>
-            <button class="number-button" onclick="appendToAnswer('9')">9</button>
-            <button class="number-button" onclick="appendToAnswer('0')">0</button>
-            <button class="number-button" onclick="appendToAnswer('-')">-</button>
-            <button class="number-button" onclick="clearAnswer()">C</button>
-        </div>
-        <div class="button-container">
-            <button class="number-button" onclick="checkAnswer()">答え合わせ</button>
-        </div>
-        <div id="result"></div>
-    </div>
-<div>
-  <h2>High Scores</h2>
-  <ul id="scoresList">
-    <!-- High scores will be displayed here -->
-  </ul>
-</div>
-    <script>
-const firebase = require('firebase/compat'); // Import the compat version for CommonJS
-require('firebase/compat/database'); // Import the Firebase Realtime Database
+<form id="dataForm">
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name" required><br>
 
-          const firebaseConfig = {
-  apiKey: "AIzaSyDGHRQsE7-YH0UxEJ8FvdShUr3_k3AoMQM",
-  authDomain: "ip-add-47c83.firebaseapp.com",
-  databaseURL: "https://ip-add-47c83-default-rtdb.firebaseio.com",
-  projectId: "ip-add-47c83",
-  storageBucket: "ip-add-47c83.appspot.com",
-  messagingSenderId: "711426693718",
-  appId: "1:711426693718:web:58596892bf55e38d0779f7",
-  measurementId: "G-J8856JS59G"
-  };
+  <label for="sheetname">Sheet Name:</label>
+  <input type="text" id="sheetname" name="sheetname" required><br>
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
+  <label for="text">Text:</label>
+  <textarea id="text" name="text" required></textarea><br>
 
-        
-        let selectedDifficulty = false;
-        let timer;
-        let difficulty = '';
-        let timeLeft = 60; // Define timeLeft variable
-        let inputEnabled = false;
-        let correctAnswers = 0; // Keep track of the correct answers.
+  <button type="button" onclick="getLocation()">Get Location</button>
+  <input type="hidden" id="location" name="location"><br>
 
-        function enableInput() {
-            inputEnabled = true;
-            document.getElementById('answer').removeAttribute('disabled');
-        }
+  <input type="hidden" id="ip" name="ip">
 
-        function disableInput() {
-            inputEnabled = false;
-            document.getElementById('answer').setAttribute('disabled', 'disabled');
-        }
+  <button type="button" onclick="submitForm()">Submit</button>
+</form>
 
-        function getRandomNumber(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function getQuestionDifficultyMultiplier() {
-            if (difficulty === '入門') {
-                return 1;
-            } else if (difficulty === '簡単') {
-                return 2;
-            } else if (difficulty === '普通') {
-                return 3;
-            } else if (difficulty === '難しい') {
-                return 4;
-            } else if (difficulty === '修羅') {
-                return 5;
-            }
-        }
-
-        function generateQuestion() {
-            // Generate a question based on difficulty
-            const multiplier = getQuestionDifficultyMultiplier();
-            let num1, num2;
-            let operator = '+';
-
-            if (difficulty === '入門') {
-                num1 = getRandomNumber(1 * multiplier, 9 * multiplier);
-                num2 = getRandomNumber(1 * multiplier, 9 * multiplier);
-            } else if (difficulty === '簡単') {
-                num1 = getRandomNumber(1 * multiplier, 9 * multiplier);
-                num2 = getRandomNumber(10 * multiplier, 99 * multiplier);
-            } else if (difficulty === '普通') {
-                num1 = getRandomNumber(1 * multiplier, 9 * multiplier);
-                num2 = getRandomNumber(100 * multiplier, 999 * multiplier);
-            } else if (difficulty === '難しい') {
-                num1 = getRandomNumber(100 * multiplier, 999 * multiplier);
-                num2 = getRandomNumber(1000 * multiplier, 9999 * multiplier);
-                const operators = ['+', '-', '*', '/'];
-                operator = operators[getRandomNumber(0, 3)];
-            } else if (difficulty === '修羅') {
-                num1 = getRandomNumber(100 * multiplier, 999 * multiplier);
-                num2 = getRandomNumber(100 * multiplier, 999 * multiplier);
-                const operators = ['+', '-', '*', '/', '√'];
-                operator = operators[getRandomNumber(0, 4)];
-            }
-
-            return `${num1} ${operator} ${num2}`;
-        }
-
-        function displayQuestion() {
-            document.getElementById('question').textContent = generateQuestion();
-        }
-
-        function checkAnswer() {
-            if (!inputEnabled) return;
-
-            const answer = parseFloat(document.getElementById('answer').value);
-            const question = document.getElementById('question').textContent;
-            const resultDiv = document.getElementById('result');
-            const correctSound = document.getElementById('correctSound');
-            const wrongSound = document.getElementById('wrongSound');
-
-            if (eval(question) === answer) {
-                correctAnswers++;
-                resultDiv.textContent = '正解！';
-                correctSound.play();
-            } else {
-                resultDiv.textContent = '不正解！';
-                wrongSound.play();
-            }
-
-            document.getElementById('answer').value = '';
-            displayQuestion();
-        }
-
-        function startGame() {
-            correctAnswers = 0; // Reset the correct answers count.
-            document.getElementById('result').textContent = '';
-            document.getElementById('answer').value = '';
-            disableInput();
-            document.getElementById('startButton').style.display = 'none';
-            displayQuestion();
-            startTimer();
-            enableInput();
-        }
-
-        function startTimer() {
-            const timerDiv = document.getElementById('timer');
-            timerDiv.textContent = `残り時間: 60秒`;
-            timer = setInterval(() => {
-                timeLeft--;
-                timerDiv.textContent = `残り時間: ${timeLeft}秒`;
-
-                if (timeLeft <= 0) {
-                    endGame();
-                }
-            }, 1000);
-        }
-
-function endGame() {
-  clearInterval(timer);
-  document.getElementById('question').textContent = '時間切れ！';
-  document.getElementById('answer').setAttribute('disabled', 'disabled');
-  const score = calculateScore(); // Calculate the score.
-  document.getElementById('result').textContent = `スコア: ${score} 問`;
-  document.getElementById('timer').textContent = '';
-  document.getElementById('startButton').style.display = 'inline-block';
-
-  // Ask the player for their name
-  const playerName = prompt("Enter your name:");
-  if (playerName) {
-    // Reference to your Firebase database
-    const database = firebase.database();
-
-    // Push the score along with the player's name to the "scores" node
-    database.ref("scores").push({
-      name: playerName,
-      score: score,
-    });
+<script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    alert("Geolocation is not supported by this browser.");
   }
 }
 
-
-        function checkEnter(event) {
-            if (event.key === 'Enter') {
-                checkAnswer();
-            }
-        }
-
-        function appendToAnswer(value) {
-            if (!inputEnabled) return;
-            document.getElementById('answer').value += value;
-        }
-
-        function clearAnswer() {
-            if (!inputEnabled) return;
-            document.getElementById('answer').value = '';
-        }
-
-        function setDifficulty(selectedDifficulty) {
-            difficulty = selectedDifficulty;
-            document.getElementById('question').textContent = '';
-            document.getElementById('startButton').style.display = 'inline-block';
-            document.getElementById('selectedDifficulty').textContent = `選択した難易度: ${selectedDifficulty}`;
-            selectedDifficulty = true;
-        }
-
-        setDifficulty('入門');
-
-        function calculateScore() {
-            // Define a score multiplier for each difficulty.
-            const scoreMultipliers = {
-                '入門': 1,
-                '簡単': 2,
-                '普通': 4,
-                '難しい': 7,
-                '修羅': 8,
-            };
-
-            // Calculate the score based on correctAnswers and the selected difficulty.
-            const difficultyMultiplier = scoreMultipliers[difficulty] || 1;
-            return correctAnswers * difficultyMultiplier;
-        }
-
-        // Function to display high scores
-function displayHighScores() {
-  const database = firebase.database();
-  const scoresRef = database.ref("scores").orderByChild("score").limitToLast(10);
-
-  scoresRef.on("value", (snapshot) => {
-    const scoresList = document.getElementById("scoresList");
-    scoresList.innerHTML = ""; // Clear previous scores
-
-    snapshot.forEach((child) => {
-      const scoreData = child.val();
-      const scoreItem = document.createElement("li");
-      scoreItem.textContent = `${scoreData.name}: ${scoreData.score} 問`;
-      scoresList.appendChild(scoreItem);
-    });
-  });
+function showPosition(position) {
+  document.getElementById("location").value = position.coords.latitude + "," + position.coords.longitude;
 }
 
-// Call this function to display high scores
-displayHighScores();
+function getIP() {
+  fetch('https://ipinfo.io?callback')
+    .then(res => res.json())
+    .then(json => {
+      document.getElementById("ip").value = json.ip;
+    })
+    .catch(error => console.error('Error fetching IP:', error));
+}
 
-    </script>
+function submitForm() {
+  // Set IP before submitting
+  getIP();
+  
+  // Submit the form
+  document.getElementById("dataForm").submit();
+}
+</script>
+
 </body>
 </html>
