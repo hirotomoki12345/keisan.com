@@ -159,6 +159,9 @@ function submitForm() {
     .then(response => response.text())
     .then(data => {
         console.log(data);
+        // Clear the form after successful submission
+        document.getElementById("name").value = "";
+        document.getElementById("text").value = "";
     })
     .catch(error => console.error('Error submitting form:', error));
 }
