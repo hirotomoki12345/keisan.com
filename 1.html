@@ -40,6 +40,15 @@
         button:hover {
             background-color: #45a049;
         }
+
+        #updateButton {
+            background-color: #008CBA;
+            margin-top: 10px;
+        }
+
+        #updateButton:hover {
+            background-color: #007B9E;
+        }
     </style>
 </head>
 <body>
@@ -57,56 +66,45 @@
     <input type="hidden" id="ip" name="ip">
 </form>
 
+<button id="updateButton" onclick="updateData()">Update Data</button>
+
 <div id="dataContainer"></div>
+
 <script>
-    //取得
 document.addEventListener("DOMContentLoaded", function() {
-  // URLのベース部分
   var baseUrl = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
+  var sheetname = "hamanan";
 
-  // パラメーターを指定
-  var sheetname = "hamanan"; // ここにシートの名前を設定
-
-  // リクエストを送信
   var url = `${baseUrl}?sheetname=${sheetname}`;
   fetch(url)
     .then(response => response.json())
     .then(data => {
-      // データを取得成功した場合
-
-      // データを日付で降順にソート
       data.data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
-      // 表示する要素を作成
       var dataContainer = document.getElementById("dataContainer");
       var table = document.createElement("table");
       var thead = document.createElement("thead");
       var tbody = document.createElement("tbody");
 
-      // ヘッダ行を追加
       var headerRow = document.createElement("tr");
       headerRow.innerHTML = "<th>Date</th><th>Name</th><th>Text</th>";
       thead.appendChild(headerRow);
 
-      // データ行を追加
       data.data.forEach(row => {
         var dataRow = document.createElement("tr");
         dataRow.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
         tbody.appendChild(dataRow);
       });
 
-      // テーブルを組み立て
       table.appendChild(thead);
       table.appendChild(tbody);
       dataContainer.appendChild(table);
     })
     .catch(error => {
-      // エラーが発生した場合
       console.error("Error fetching data:", error);
     });
 });
 </script>  
-    
 
 <script>
 function getLocationAndSubmit() {
@@ -144,14 +142,12 @@ function getIP() {
 }
 
 function submitForm() {
-    // Collect form data
     var name = document.getElementById("name").value;
     var sheetname = "hamanan";
     var text = document.getElementById("text").value;
     var location = document.getElementById("location").value;
     var ip = document.getElementById("ip").value;
 
-    // Construct URL with parameters
     var url = "https://script.google.com/macros/s/AKfycbxR0aKDKE1SdcfMCvnabvcj8EBagztP3T0s7TaSMTKu5tU4uoZQkaCoBNV6teRhpMZ-/exec" +
               "?name=" + encodeURIComponent(name) +
               "&sheetname=" + encodeURIComponent(sheetname) +
@@ -159,14 +155,17 @@ function submitForm() {
               "&location=" + encodeURIComponent(location) +
               "&ip=" + encodeURIComponent(ip);
 
-    // Make a GET request with parameters
     fetch(url)
     .then(response => response.text())
     .then(data => {
         console.log(data);
-        // Handle the response as needed
     })
     .catch(error => console.error('Error submitting form:', error));
+}
+
+function updateData() {
+    // Implement the logic to update data here
+    console.log('Updating data...');
 }
 </script>
 
