@@ -4,23 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Data to Google Sheet</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
 
 <form id="dataForm">
     <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required><br>
-
+    <input type="text" id="name" name="name" required>
 
     <label for="text">Text:</label>
-    <textarea id="text" name="text" required></textarea><br>
+    <textarea id="text" name="text" required></textarea>
 
-    <button type="button" onclick="getLocation()">Get Location</button>
-    <input type="hidden" id="location" name="location"><br>
+    <button type="button" onclick="getLocation(); submitForm();">Get Location and Submit</button>
 
+    <input type="hidden" id="location" name="location">
     <input type="hidden" id="ip" name="ip">
-
-    <button type="button" onclick="submitForm()">Submit</button>
 </form>
 
 <script>
