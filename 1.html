@@ -71,42 +71,42 @@
 <div id="dataContainer"></div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  var baseUrl = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
-  var sheetname = "hamanan";
+function updateData() {
+    var baseUrl = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
+    var sheetname = "hamanan";
 
-  var url = `${baseUrl}?sheetname=${sheetname}`;
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      data.data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+    var url = `${baseUrl}?sheetname=${sheetname}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            data.data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
-      var dataContainer = document.getElementById("dataContainer");
-      var table = document.createElement("table");
-      var thead = document.createElement("thead");
-      var tbody = document.createElement("tbody");
+            var dataContainer = document.getElementById("dataContainer");
+            dataContainer.innerHTML = '';
 
-      var headerRow = document.createElement("tr");
-      headerRow.innerHTML = "<th>Date</th><th>Name</th><th>Text</th>";
-      thead.appendChild(headerRow);
+            var table = document.createElement("table");
+            var thead = document.createElement("thead");
+            var tbody = document.createElement("tbody");
 
-      data.data.forEach(row => {
-        var dataRow = document.createElement("tr");
-        dataRow.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
-        tbody.appendChild(dataRow);
-      });
+            var headerRow = document.createElement("tr");
+            headerRow.innerHTML = "<th>Date</th><th>Name</th><th>Text</th>";
+            thead.appendChild(headerRow);
 
-      table.appendChild(thead);
-      table.appendChild(tbody);
-      dataContainer.appendChild(table);
-    })
-    .catch(error => {
-      console.error("Error fetching data:", error);
-    });
-});
-</script>  
+            data.data.forEach(row => {
+                var dataRow = document.createElement("tr");
+                dataRow.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
+                tbody.appendChild(dataRow);
+            });
 
-<script>
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            dataContainer.appendChild(table);
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+        });
+}
+
 function getLocationAndSubmit() {
     getLocation()
         .then(() => getIP())
@@ -163,10 +163,9 @@ function submitForm() {
     .catch(error => console.error('Error submitting form:', error));
 }
 
-function updateData() {
-    // Implement the logic to update data here
-    console.log('Updating data...');
-}
+document.addEventListener("DOMContentLoaded", function() {
+    updateData();
+});
 </script>
 
 </body>
