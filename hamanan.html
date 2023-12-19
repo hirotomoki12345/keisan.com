@@ -4,39 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hamanan</title>
-
     <style>
-        h1 {
-            color: red;
-            text-align: center; /* 中央揃えに変更 */
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
+        h1, body {
+            text-align: center;
             margin: 20px;
-            text-align: center; /* 中央揃えに変更 */
+            font-family: Arial, sans-serif;
         }
-        
         form {
             max-width: 400px;
             margin: auto;
-            text-align: left; /* 左揃えに変更（必要に応じて調整） */
+            text-align: left;
         }
-        
         label {
             display: block;
             margin-bottom: 8px;
-            text-align: left; /* 左揃えに変更（必要に応じて調整） */
+            text-align: left;
         }
-        
-        input,
-        textarea {
+        input, textarea {
             width: 100%;
             padding: 8px;
             margin-bottom: 16px;
             box-sizing: border-box;
         }
-        
         button {
             background-color: #4CAF50;
             color: white;
@@ -45,16 +34,13 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        
         button:hover {
             background-color: #45a049;
         }
-        
         #updateButton {
             background-color: #008CBA;
             margin-top: 10px;
         }
-        
         #updateButton:hover {
             background-color: #007B9E;
         }
@@ -70,57 +56,72 @@
     <textarea id="text" name="text" required></textarea>
 
     <button type="button" onclick="getLocationAndSubmit()">送信</button>
-
     <input type="hidden" id="location" name="location">
     <input type="hidden" id="ip" name="ip">
 </form>
 
 <button id="updateButton" onclick="updateData()">更新</button>
-
 <div id="dataContainer"></div>
 
 <script>
+var isButtonDisabled = false;
+
 function updateData() {
+    if (isButtonDisabled) return;
+    isButtonDisabled = true;
+
+    fetchUpdateData()
+        .then(() => isButtonDisabled = false)
+        .catch(() => isButtonDisabled = false);
+}
+
+function fetchUpdateData() {
     var baseUrl = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
     var sheetname = "hamanan";
-
     var url = `${baseUrl}?sheetname=${sheetname}`;
-    fetch(url)
+
+    return fetch(url)
         .then(response => response.json())
-        .then(data => {
-            data.data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+        .then(data => displayData(data))
+        .catch(error => console.error("Error fetching data:", error));
+}
 
-            var dataContainer = document.getElementById("dataContainer");
-            dataContainer.innerHTML = '';
+function displayData(data) {
+    data.data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
 
-            var table = document.createElement("table");
-            var thead = document.createElement("thead");
-            var tbody = document.createElement("tbody");
+    var dataContainer = document.getElementById("dataContainer");
+    dataContainer.innerHTML = '';
 
-            var headerRow = document.createElement("tr");
-            headerRow.innerHTML = "<th>Date</th><th>Name</th><th>Text</th>";
-            thead.appendChild(headerRow);
+    var table = document.createElement("table");
+    var thead = document.createElement("thead");
+    var tbody = document.createElement("tbody");
 
-            data.data.forEach(row => {
-                var dataRow = document.createElement("tr");
-                dataRow.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
-                tbody.appendChild(dataRow);
-            });
+    var headerRow = document.createElement("tr");
+    headerRow.innerHTML = "<th>Date</th><th>Name</th><th>Text</th>";
+    thead.appendChild(headerRow);
 
-            table.appendChild(thead);
-            table.appendChild(tbody);
-            dataContainer.appendChild(table);
-        })
-        .catch(error => {
-            console.error("Error fetching data:", error);
-        });
+    data.data.forEach(row => {
+        var dataRow = document.createElement("tr");
+        dataRow.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
+        tbody.appendChild(dataRow);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    dataContainer.appendChild(table);
 }
 
 function getLocationAndSubmit() {
+    if (isButtonDisabled) return;
+    isButtonDisabled = true;
+
     getLocation()
-        .then(() => getIP())
-        .then(() => submitForm())
-        .catch(error => console.error('Error:', error));
+        .then(getIP)
+        .then(submitForm)
+        .catch(error => {
+            console.error('Error:', error);
+            isButtonDisabled = false;
+        });
 }
 
 function getLocation() {
@@ -129,9 +130,7 @@ function getLocation() {
             navigator.geolocation.getCurrentPosition(position => {
                 document.getElementById("location").value = position.coords.latitude + "," + position.coords.longitude;
                 resolve();
-            }, error => {
-                reject("Geolocation error: " + error.message);
-            });
+            }, error => reject("Geolocation error: " + error.message));
         } else {
             reject("Geolocation is not supported by this browser.");
         }
@@ -141,9 +140,7 @@ function getLocation() {
 function getIP() {
     return fetch('https://ipinfo.io?callback')
         .then(res => res.json())
-        .then(json => {
-            document.getElementById("ip").value = json.ip;
-        })
+        .then(json => document.getElementById("ip").value = json.ip)
         .catch(error => {
             console.error('Error fetching IP:', error);
             throw error;
@@ -157,27 +154,19 @@ function submitForm() {
     var location = document.getElementById("location").value;
     var ip = document.getElementById("ip").value;
 
-    var url = "https://script.google.com/macros/s/AKfycbxR0aKDKE1SdcfMCvnabvcj8EBagztP3T0s7TaSMTKu5tU4uoZQkaCoBNV6teRhpMZ-/exec" +
-              "?name=" + encodeURIComponent(name) +
-              "&sheetname=" + encodeURIComponent(sheetname) +
-              "&text=" + encodeURIComponent(text) +
-              "&location=" + encodeURIComponent(location) +
-              "&ip=" + encodeURIComponent(ip);
+    var url = `https://script.google.com/macros/s/AKfycbxR0aKDKE1SdcfMCvnabvcj8EBagztP3T0s7TaSMTKu5tU4uoZQkaCoBNV6teRhpMZ-/exec?name=${encodeURIComponent(name)}&sheetname=${encodeURIComponent(sheetname)}&text=${encodeURIComponent(text)}&location=${encodeURIComponent(location)}&ip=${encodeURIComponent(ip)}`;
 
     fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        console.log(data);
-        // Clear the form after successful submission
-        document.getElementById("name").value = "";
-        document.getElementById("text").value = "";
-    })
-    .catch(error => console.error('Error submitting form:', error));
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            document.getElementById("name").value = "";
+            document.getElementById("text").value = "";
+        })
+        .catch(error => console.error('Error submitting form:', error));
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    updateData();
-});
+document.addEventListener("DOMContentLoaded", updateData);
 </script>
 
 </body>
