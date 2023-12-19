@@ -11,8 +11,6 @@
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" required><br>
 
-    <label for="sheetname">Sheet Name:</label>
-    <input type="text" id="sheetname" name="sheetname" required><br>
 
     <label for="text">Text:</label>
     <textarea id="text" name="text" required></textarea><br>
@@ -53,7 +51,7 @@ function submitForm() {
 
     // Collect form data
     var name = document.getElementById("name").value;
-    var sheetname = document.getElementById("sheetname").value;
+    var sheetname = "a";
     var text = document.getElementById("text").value;
     var location = document.getElementById("location").value;
     var ip = document.getElementById("ip").value;
