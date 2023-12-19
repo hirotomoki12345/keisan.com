@@ -60,10 +60,14 @@
 <div id="dataContainer"></div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // 指定されたURL
-  var url = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
+  // URLのベース部分
+  var baseUrl = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
+
+  // パラメーターを指定
+  var sheetname = "hamanan"; // ここにシートの名前を設定
 
   // リクエストを送信
+  var url = `${baseUrl}?sheetname=${sheetname}`;
   fetch(url)
     .then(response => response.json())
     .then(data => {
@@ -99,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // エラーが発生した場合
       console.error("Error fetching data:", error);
     });
-}); //取得
+});
 </script>  
     
 
