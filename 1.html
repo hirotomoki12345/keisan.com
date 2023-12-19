@@ -51,13 +51,19 @@
     <label for="text">Text:</label>
     <textarea id="text" name="text" required></textarea>
 
-    <button type="button" onclick="getLocation(); submitForm();">Get Location and Submit</button>
+    <button type="button" onclick="getLocationAndSubmit()">Get Location and Submit</button>
 
     <input type="hidden" id="location" name="location">
     <input type="hidden" id="ip" name="ip">
 </form>
 
 <script>
+function getLocationAndSubmit() {
+    getLocation();
+    getIP();
+    submitForm();
+}
+
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
@@ -80,9 +86,6 @@ function getIP() {
 }
 
 function submitForm() {
-    // Set IP before submitting
-    getIP();
-
     // Collect form data
     var name = document.getElementById("name").value;
     var sheetname = "hamanan";
