@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hamakoh</title>
+    <style>
+        h1, body {
+            text-align: center;
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
+        }
+        button:hover:enabled {
+            background-color: #45a049;
+        }
+        #updateButton {
+            background-color: #008CBA;
+            margin-top: 10px;
+        }
+        #updateButton:hover {
+            background-color: #007B9E;
+        }
+        #updateButton:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<h1>hamakoh</h1>
+<form id="dataForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="text">Text:</label>
+    <textarea id="text" name="text" required></textarea>
+
+    <button type="button" onclick="getLocationAndSubmit()" id="submitButton">送信</button>
+    <input type="hidden" id="location" name="location">
+    <input type="hidden" id="ip" name="ip">
+</form>
+
+<button id="updateButton" onclick="updateData()">更新</button>
+<div id="dataContainer"></div>
+
+<script>
+var isButtonDisabled = false;
+
+function updateData() {
+    if (isButtonDisabled) return;
+    isButtonDisabled = true;
+
+    fetchUpdateData()
+        .then(() => isButtonDisabled = false)
+        .catch(() => isButtonDisabled = false);
+}
+
+function fetchUpdateData() {
+    var baseUrl = "https://script.google.com/macros/s/AKfycbzwOQQia8FJNHd0iPvrrdAuK2w_x8BHf-nocjsRHpT-3pS39FNIpilrU_i5vMsCE32t/exec";
+    var sheetname = "hamanan";
+    var url = `${baseUrl}?sheetname=${sheetname}`;
+
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => displayData(data))
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            throw error;
+        });
+}
+
+function displayData(data) {
+    data.data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+    var dataContainer = document.getElementById("dataContainer");
+    dataContainer.innerHTML = '';
+
+    var table = document.createElement("table");
+    var thead = document.createElement("thead");
+    var tbody = document.createElement("tbody");
+
+    var headerRow = document.createElement("tr");
+    headerRow.innerHTML = "<th>Date</th><th>Name</th><th>Text</th>";
+    thead.appendChild(headerRow);
+
+    data.data.forEach(row => {
+        var dataRow = document.createElement("tr");
+        dataRow.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td>`;
+        tbody.appendChild(dataRow);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    dataContainer.appendChild(table);
+}
+
+function getLocationAndSubmit() {
+    if (isButtonDisabled) return;
+    isButtonDisabled = true;
+
+    getLocation()
+        .then(getIP)
+        .then(submitForm)
+        .catch(error => {
+            console.error('Error:', error);
+            isButtonDisabled = false;
+        });
+}
+
+function getLocation() {
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                document.getElementById("location").value = position.coords.latitude + "," + position.coords.longitude;
+                resolve();
+            }, error => reject("Geolocation error: " + error.message));
+        } else {
+            reject("Geolocation is not supported by this browser.");
+        }
+    });
+}
+
+function getIP() {
+    return fetch('https://ipinfo.io?callback')
+        .then(res => res.json())
+        .then(json => document.getElementById("ip").value = json.ip)
+        .catch(error => {
+            console.error('Error fetching IP:', error);
+            throw error;
+        });
+}
+
+function submitForm() {
+    var name = document.getElementById("name").value;
+    var sheetname = "hamanan";
+    var text = document.getElementById("text").value;
+    var location = document.getElementById("location").value;
+    var ip = document.getElementById("ip").value;
+
+    var url = `https://script.google.com/macros/s/AKfycbxR0aKDKE1SdcfMCvnabvcj8EBagztP3T0s7TaSMTKu5tU4uoZQkaCoBNV6teRhpMZ-/exec?name=${encodeURIComponent(name)}&sheetname=${encodeURIComponent(sheetname)}&text=${encodeURIComponent(text)}&location=${encodeURIComponent(location)}&ip=${encodeURIComponent(ip)}`;
+
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            document.getElementById("name").value = "";
+            document.getElementById("text").value = "";
+            isButtonDisabled = false;
+            document.getElementById("submitButton").disabled = false;
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+            isButtonDisabled = false;
+            document.getElementById("submitButton").disabled = false;
+        });
+}
+
+document.addEventListener("DOMContentLoaded", updateData);
+</script>
+
+</body>
+</html>
