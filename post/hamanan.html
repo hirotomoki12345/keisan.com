@@ -165,7 +165,7 @@ function submitForm() {
     var location = document.getElementById("location").value;
     var ip = document.getElementById("ip").value;
 
-    var url = `https://script.google.com/macros/s/AKfycbxR0aKDKE1SdcfMCvnabvcj8EBagztP3T0s7TaSMTKu5tU4uoZQkaCoBNV6teRhpMZ-/exec?name=${encodeURIComponent(name)}&sheetname=${encodeURIComponent(sheetname)}&text=${encodeURIComponent(text)}&location=${encodeURIComponent(location)}&ip=${encodeURIComponent(ip)}`;
+    var url = `https://script.google.com/macros/s/AKfycbyMWIDDszXgHv4RpEx8ohVxby8Isdo8ktEIqGT-j-w4HZPvjT6Igabbj17VDqhiqqDU/exec?name=${encodeURIComponent(name)}&sheetname=${encodeURIComponent(sheetname)}&text=${encodeURIComponent(text)}&location=${encodeURIComponent(location)}&ip=${encodeURIComponent(ip)}`;
 
     fetch(url)
         .then(response => response.text())
